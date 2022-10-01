@@ -6,15 +6,15 @@ from datetime import datetime
 
 class Crawler(ABC):
     @abstractmethod
-    def retrieve_news(self, max_pages: int, region_lock: bool = False, regions: list = None):
+    def retrieve_news(self, max_pages: int = -1, regions: list = None):
         pass
 
     @abstractmethod
-    def parse_news(self, news_urls: list, parse_content: bool = False):
+    def parse_news(self, news_urls: list, parse_body: bool = False):
         pass
 
     @abstractmethod
-    def search_news(self, keywords: list, max_pages: int):
+    def search_news(self, keywords: list, max_pages: int = -1):
         pass
 
     @abstractmethod
