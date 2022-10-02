@@ -62,7 +62,12 @@ class G1News(Crawler):
                         break
 
                     for item in page['items']:
-                        news_urls.append(item['content']['url'] if ('materia' in item['type']) else ())
+                        try:
+                            url = item['content']['url'] if ('materia' in item['type']) else ()
+                            if url is not None:
+                                news_urls.append(url)
+                        except KeyError:
+                            continue
 
                     if i == max_pages:
                         break
