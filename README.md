@@ -28,7 +28,7 @@
     <tr>
       <td>Folha de São Paulo</td>
       <td>:heavy_check_mark: Funcional</td>
-      <td>:heavy_check_mark: Funcional:</td>
+      <td>:heavy_check_mark: Funcional</td>
       <td><a href="https://www.folha.uol.com.br/">Link</a></td>
     </tr>
     <tr>
