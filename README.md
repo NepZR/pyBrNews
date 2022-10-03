@@ -26,10 +26,10 @@
       <td><a href="https://g1.globo.com/">Link</a></td>
     </tr>
     <tr>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
+      <td>Folha de São Paulo</td>
+      <td>:heavy_check_mark: Funcional</td>
+      <td>:heavy_check_mark: Funcional:</td>
+      <td><a href="https://www.folha.uol.com.br/">Link</a></td>
     </tr>
     <tr>
       <td>:question:</td>
@@ -61,6 +61,6 @@
 
 <table style="display: flex; align-itens: center; justify-content: center;">
   <tr>
-    <td align="center"><a href="https://github.com/NepZR"><img style="width: 150px; height: 150;" src="https://avatars.githubusercontent.com/u/37887926" width="100px;" alt=""/><br /><sub><b>Lucas Darlindo Freitas Rodrigues</b></sub></a><br /><sub><b>Dev. Backend Python Jr.</sub></a><br /><a href="https://www.linkedin.com/in/lucasdfr"><sub><b>LinkedIn (lucasdfr)</b></sub></a></td>
+    <td align="center"><a href="https://github.com/NepZR"><img style="width: 150px; height: 150;" src="https://avatars.githubusercontent.com/u/37887926" width="100px;" alt=""/><br /><sub><b>Lucas Darlindo Freitas Rodrigues</b></sub></a><br /><sub><b>Dev. Backend Python</sub></a><br /><a href="https://www.linkedin.com/in/lucasdfr"><sub><b>LinkedIn (lucasdfr)</b></sub></a></td>
   </tr>
 <table>
