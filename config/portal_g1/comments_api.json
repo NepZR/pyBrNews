@@ -1,6 +1,7 @@
 {
   "api_url": {
-    "comments_engine": "https://ge.comentarios.globo.com/api/graphql"
+    "comments_engine": "https://ge.comentarios.globo.com/api/graphql",
+    "count_engine": "https://g1.comentarios.globo.com/api/story/count?url="
   },
 
   "params": {

@@ -4,7 +4,8 @@ from urllib.parse import unquote
 
 import requests.exceptions
 from requests_html import HTMLSession
-from typing import Union, List
+from typing import Union, List, Iterable
+from loguru import logger
 from itertools import count
 
 from News.crawler import Crawler
@@ -35,48 +36,77 @@ class G1News(Crawler):
             requests.exceptions.ReadTimeout, requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema
         )
 
-    def retrieve_news(self, max_pages: int = -1, regions: list = None) -> List[str]:
-        news_urls = []
-        if regions is None:
+    def _retrieve_news_by_region(self, regions: list, max_pages: int = -1) -> Iterable[str]:
+        for region in regions:
             for i in count():
                 try:
                     page = SESSION.get(
-                        self._NEWS_API.format(self._API_CONFIG['regions']['brasil'], str(i + 1))
+                        self._NEWS_API.format(self._API_CONFIG['regions'][region], str(i + 1))
                     ).json()
                 except json.decoder.JSONDecodeError:
                     break
 
                 for item in page['items']:
-                    news_urls.append(item['content']['url'] if ('materia' in item['type']) else ())
-
-                if i == max_pages:
-                    break
-        else:
-            for region in regions:
-                for i in count():
                     try:
-                        page = SESSION.get(
-                            self._NEWS_API.format(self._API_CONFIG['regions'][region], str(i + 1))
-                        ).json()
-                    except json.decoder.JSONDecodeError:
-                        break
-
-                    for item in page['items']:
-                        try:
-                            url = item['content']['url'] if ('materia' in item['type']) else ()
+                        url = str(item['content']['url']) if ('materia' in item['type']) else None
+                        if url is not None:
+                            logger.success(
+                                f"URL from G1 {region.upper()} retrieved successfully! Item added to list: {url}"
+                            )
+                            yield url
+                    except KeyError:
+                        for article in item['content']['posts']:
+                            url = article['url']
                             if url is not None:
-                                news_urls.append(url)
-                        except KeyError:
-                            continue
+                                logger.success(
+                                    f"URL from G1 {region.upper()} retrieved successfully! Item added to list: {url}"
+                                )
+                                yield url
 
-                    if i == max_pages:
-                        break
+                if i+1 == max_pages:
+                    break
+
+    def _retrieve_news_brazil(self, max_pages: int = -1) -> Iterable[str]:
+        for i in count():
+            try:
+                page = SESSION.get(
+                    self._NEWS_API.format(self._API_CONFIG['regions']['brasil'], str(i + 1))
+                ).json()
+            except json.decoder.JSONDecodeError:
+                break
+
+            for item in page['items']:
+                try:
+                    url = item['content']['url'] if ('materia' in item['type']) else ()
+                    if url is not None:
+                        logger.success(f"URL from G1 retrieved successfully! Item added to list: {url}")
+                        yield url
+                except KeyError:
+                    for article in item['content']['posts']:
+                        url = article['url']
+                        if url is not None:
+                            logger.success(
+                                f"URL from G1 retrieved successfully! Item added to list: {url}"
+                            )
+                            yield url
+
+            if i+1 == max_pages:
+                break
+
+    def retrieve_news(self, regions: list = None, max_pages: int = -1) -> List[str]:
+        news_urls = []
+        if regions is None:
+            news_urls = [url for url in self._retrieve_news_brazil(max_pages=max_pages)]
+
+        if regions is not None:
+            news_urls = [url for url in self._retrieve_news_by_region(regions=regions, max_pages=max_pages)]
 
         return news_urls
 
-    def parse_news(self, news_urls: list, parse_body: bool = False) -> List[dict]:
-        parsed_data = []
-        for url in news_urls:
+    def parse_news(self, news_urls: list, parse_body: bool = False) -> Iterable[dict]:
+        parsed_counter = 0
+        for i, url in enumerate(news_urls):
+            logger.info(f"Article {i+1} >> Parsing data at {datetime.now()}.")
             parsed_news = {
                 'title': str,
                 'abstract': str,
@@ -125,15 +155,23 @@ class G1News(Crawler):
 
                 parsed_news['html'] = page.content
 
-                parsed_data.append(parsed_news)
+                parsed_counter += 1
+
+                logger.success(f"Article {i+1} >> Data parsed successfully!.")
+                yield parsed_news
             except self._ERRORS as error:
-                print(f'Error parsing the page. Skipping. Error: {error}')
+                logger.error(f'Error parsing data from the page. Skipping. Error: {error}')
                 continue
-        return parsed_data
+
+        logger.success(
+            f"All the data have been parsed successfully! "
+            f"{parsed_counter} of {len(news_urls)} news had the data extracted."
+        )
 
     def search_news(self, keywords: list, max_pages: int = -1) -> List[str]:
         news_urls = []
         for keyword in keywords:
+            logger.info(f"Retrieving news from G1 associated with the Keyword \"{keyword}\".")
             for i in count():
                 page = SESSION.get(self._SEARCH_API.format(keyword, str(i+1)))
                 if "page" not in page.url:
@@ -144,10 +182,16 @@ class G1News(Crawler):
                 )]
                 news_urls += (url for url in news_list if 'g1.globo.com' in url)
 
-                if i == max_pages:
+                if i+1 == max_pages:
                     break
+
+        logger.success(
+            f"News retrieved successfully! A total of {len(news_urls)} articles have been found."
+        )
+
         return news_urls
 
     def parse_url(self, url: str) -> dict:
         if 'g1.globo.com' in url:
-            return self.parse_news([url])[0]
+            data = [data for data in self.parse_news([url], parse_body=True)]
+            return data[0]

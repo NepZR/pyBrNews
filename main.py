@@ -6,15 +6,15 @@ if __name__ == '__main__':
     g1 = G1News()
     g1c = G1Comments()
 
-    parsed_news = g1.retrieve_news(
-            max_pages=1000, regions=['am', 'ac', 'pa', 'rr', 'ro', 'ap', 'to']
-    )
+    # parsed_news = g1.retrieve_news(
+    #         max_pages=300, regions=['am', 'ac', 'pa', 'rr', 'ro', 'ap', 'to']
+    # )
 
-    # parsed_news = g1.search_news(keywords=['Bolsonaro'])
+    parsed_news = g1.search_news(keywords=['Elaine Caparroz'])
 
-    parsed_news_data = g1.parse_news(news_urls=parsed_news, parse_body=True)
+    parsed_news_data = [data for data in g1.parse_news(news_urls=parsed_news, parse_body=True)]
     for counter, news in enumerate(parsed_news_data):
-        logger.debug(f"News {counter+1} -- {news['title']} on {news['url']}")
+        logger.debug(f"News {counter+1} -- {news['title']} from Section {news['section']}")
 
     for counter, comment in enumerate(g1c.parse_comments(news_list=parsed_news_data)):
         logger.debug(f"News {counter+1} -- {comment['comment']} by {comment['url']} with {comment['upvote']} upvotes.")
