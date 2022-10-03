@@ -1,0 +1,12 @@
+{
+  "api_url": {
+    "comments_engine": "https://ge.comentarios.globo.com/api/graphql",
+    "count_engine": "https://g1.comentarios.globo.com/api/story/count?url="
+  },
+
+  "params": {
+    "query": "",
+    "id": "cf0bfa0e60dd576a3908cde9a42cd1f0",
+    "variables": "{\"storyURL\":\"@\",\"commentsOrderBy\":\"CREATED_AT_DESC\",\"storyMode\":\"COMMENTS\",\"flattenReplies\":true}"
+  }
+}
