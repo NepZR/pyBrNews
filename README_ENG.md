@@ -19,27 +19,27 @@
     </tr>
     <tr>
       <td>Portal G1</td>
-      <td>:heavy_check_mark: Working</td>
-      <td>:warning: In progress</td>
+      <td>:white_check_mark: Working</td>
+      <td>:keyboard: In progress</td>
       <td><a href="https://g1.globo.com/">Link</a></td>
     </tr>
     <tr>
       <td>Folha de São Paulo</td>
-      <td>:heavy_check_mark: Working</td>
-      <td>:heavy_check_mark: Working</td>
+      <td>:white_check_mark: Working</td>
+      <td>:white_check_mark: Working</td>
       <td><a href="https://www.folha.uol.com.br/">Link</a></td>
     </tr>
     <tr>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
+      <td>Exame</td>
+      <td>:white_check_mark: Working</td>
+      <td>:x: Not supported</td>
+      <td><a href="https://exame.com/">Link</a></td>
     </tr>
     <tr>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
+      <td>Metrópoles</td>
+      <td>:keyboard: In progress</td>
+      <td>:keyboard: In progress</td>
+      <td><a href="https://www.metropoles.com/">Link</a></td>
     </tr>
 </table>
 
