@@ -21,27 +21,27 @@
     </tr>
     <tr>
       <td>Portal G1</td>
-      <td>:heavy_check_mark: Funcional</td>
-      <td>:warning: Em desenvolvimento</td>
+      <td>:white_check_mark: Funcional</td>
+      <td>:keyboard: Em desenvolvimento</td>
       <td><a href="https://g1.globo.com/">Link</a></td>
     </tr>
     <tr>
       <td>Folha de São Paulo</td>
-      <td>:heavy_check_mark: Funcional</td>
-      <td>:heavy_check_mark: Funcional</td>
+      <td>:white_check_mark: Funcional</td>
+      <td>:white_check_mark: Funcional</td>
       <td><a href="https://www.folha.uol.com.br/">Link</a></td>
     </tr>
     <tr>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
+      <td>Exame</td>
+      <td>:white_check_mark: Funcional</td>
+      <td>:x: Não suportado</td>
+      <td><a href="https://exame.com/">Link</a></td>
     </tr>
     <tr>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
-      <td>:question:</td>
+      <td>Metrópoles</td>
+      <td>:keyboard: Em desenvolvimento</td>
+      <td>:keyboard: Em desenvolvimento</td>
+      <td><a href="https://www.metropoles.com/">Link</a></td>
     </tr>
 </table>
 
