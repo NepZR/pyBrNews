@@ -9,6 +9,7 @@ from loguru import logger
 from itertools import count
 
 from News.crawler import Crawler
+from config import g1_api
 
 SESSION = HTMLSession()
 XPATH_DATA = {
@@ -27,8 +28,7 @@ class G1News(Crawler):
     _API_CONFIG: dict
 
     def __init__(self) -> None:
-        with open('./config/portal_g1/news_api.json') as config_api:
-            self._API_CONFIG = json.load(config_api)
+        self._API_CONFIG = g1_api.news_config
 
         self._NEWS_API = self._API_CONFIG['api_url']['news_engine']
         self._SEARCH_API = self._API_CONFIG['api_url']['search_engine']

@@ -7,6 +7,7 @@ from loguru import logger
 from requests_html import HTMLSession, HTML
 
 from Comments.crawler import Crawler
+from config import g1_api
 
 SESSION = HTMLSession()
 
@@ -16,8 +17,7 @@ class G1Comments(Crawler):
     _API_CONFIG: dict
 
     def __init__(self) -> None:
-        with open("./config/portal_g1/comments_api.json") as config_api:
-            self._API_CONFIG = json.load(config_api)
+        self._API_CONFIG = g1_api.comments_config
 
         self._COMMENTS_API = self._API_CONFIG["api_url"]["comments_engine"]
         self._COUNT_API = self._API_CONFIG["api_url"]["count_engine"]
