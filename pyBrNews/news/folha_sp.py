@@ -8,7 +8,7 @@ from urllib.parse import unquote
 from loguru import logger
 from requests_html import HTML
 
-from News.crawler import Crawler
+from news.crawler import Crawler
 
 XPATH_DATA = {
     'news_title': '//h1[@class="c-content-head__title"]/text()|//h1[@itemprop="headline"]/text()|'

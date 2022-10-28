@@ -6,7 +6,7 @@ import requests.exceptions
 from loguru import logger
 from requests_html import HTMLSession, HTML
 
-from Comments.crawler import Crawler
+from comments.crawler import Crawler
 from config import g1_api
 
 SESSION = HTMLSession()

@@ -8,7 +8,7 @@ from urllib.parse import unquote
 from loguru import logger
 from requests_html import HTML
 
-from News.crawler import Crawler
+from news.crawler import Crawler
 from config import g1_api
 
 XPATH_DATA = {

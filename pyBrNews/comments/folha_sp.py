@@ -9,7 +9,7 @@ import urllib3.exceptions
 from loguru import logger
 from requests_html import HTMLSession, Element, HTML
 
-from Comments.crawler import Crawler
+from comments.crawler import Crawler
 
 SESSION = HTMLSession()
 

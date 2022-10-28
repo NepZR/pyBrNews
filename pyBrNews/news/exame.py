@@ -6,7 +6,7 @@ from typing import Optional, List, Iterable
 from loguru import logger
 from requests_html import HTML
 
-from News.crawler import Crawler
+from news.crawler import Crawler
 
 XPATH_DATA = {
     'news_abstract': '//meta[@property="og:description"]/@content|//meta[@name="description"]/@content',

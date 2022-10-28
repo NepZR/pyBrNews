@@ -1,6 +1,6 @@
 from loguru import logger
 
-from News.g1 import G1News
+from news.g1 import G1News
 from config.database import PyBrNewsDB
 
 if __name__ == '__main__':
