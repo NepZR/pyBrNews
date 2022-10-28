@@ -117,7 +117,11 @@ class FolhaNews(Crawler):
 
     @staticmethod
     def _extract_id_data(article_page: HTML) -> Optional[dict]:
-        news_id = dict(article_page.xpath(XPATH_DATA['news_id'], first=True).attrs)
+        try:
+            news_id = dict(article_page.xpath(XPATH_DATA['news_id'], first=True).attrs)
+        except AttributeError:
+            return None
+
         if news_id is not None:
             news_id_data = {}
             if "data-section" in news_id.keys():
