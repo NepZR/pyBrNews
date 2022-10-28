@@ -1,12 +1,12 @@
 # A Brazilian News Website Data Acquisition Library for Python
-> pyBrNews Project, made with :heart: by Lucas Rodrigues (<a href="https://github.com/NepZR/" target="_blank">@NepZR</a>).
+> pyBrNews Project, made with ❤️ by Lucas Rodrigues (<a href="https://github.com/NepZR/" target="_blank">@NepZR</a>).
 
-<h4 style="text-align: justify;"> O projeto pyBrNews é uma biblioteca em desenvolvimento capaz de realizar a aquisição de dados de notícias e comentários de plataformas de notícias brasileiras, totalmente produzida na linguagem Python e utilizando como núcleo a biblioteca <a href="https://requests.readthedocs.io/projects/requests-html/en/latest/">requests-HTML</a>. Será funcional tanto em scripts, quanto em projetos feitos em ambiente interativo, como em Python Notebooks.</h4>
+<h4 style="text-align: justify;"> O projeto pyBrNews é uma biblioteca em desenvolvimento capaz de realizar a aquisição de dados de notícias e comentários de plataformas de notícias brasileiras, totalmente produzida na linguagem Python e utilizando como núcleo a biblioteca <a href="https://requests.readthedocs.io/projects/requests-html/en/latest/">requests-HTML</a>.
 
-
- <h5>🇺🇸 You are reading the Portuguese Brazilian version of this README. To read the English version, click <a href="https://github.com/NepZR/pyBrNews/blob/main/README_ENG.md">here</a>.</h5>
 
 <h4>A biblioteca também está disponível para download e instalação via PIP no PyPI! Acesse <a href="https://pypi.org/project/pyBrNews">clicando aqui</a>.</h4>
+
+ <h5>🇺🇸 You are reading the Portuguese Brazilian version of this README. To read the English version, click <a href="https://github.com/NepZR/pyBrNews/blob/main/README_ENG.md">here</a>.</h5>
 
 ---
 
@@ -78,8 +78,69 @@
   ⌨️ Métodos disponíveis para utilização
 </h3>
 
-> Em breve.
-  
+#### ● Pacote `news`
+~~~python
+def parse_news(self,
+               news_urls: List[Union[str, dict]],
+               parse_body: bool = False,
+               save_html: bool = True) -> Iterable[dict]:
+    """
+    Extracts all the data from the article in a given news platform by iterating over a URL list. Yields a 
+    dictionary containing all the parsed data from the article.
+
+    Parameters:
+        news_urls (List[str]): A list containing all the URLs or a data dict to be parsed from a given platform.
+        parse_body (bool): Defines if the article body will be extracted.
+        save_html (bool): Defines if the HTML bytes from the article will be extracted.
+    Returns:
+         Iterable[dict]: Dictionary containing all the article parsed data.
+    """
+~~~
+
+~~~python
+def search_news(self,
+                keywords: List[str],
+                max_pages: int = -1) -> List[Union[str, dict]]:
+    """
+    Extracts all the data or URLs from the news platform based on the keywords given. Returns a list containing the
+    URLs / data found for the keywords.
+
+    Parameters:
+        keywords (List[str]): A list containing all the keywords to be searched in the news platform.
+        max_pages (int): Number of pages to have the articles URLs extracted from. 
+                         If not set, will catch until the last possible.
+    Returns:
+         List[Union[str, dict]]: List containing all the URLs / data found for the keywords.
+    """
+~~~
+
+#### ● Pacote `config.database`
+
+~~~python
+def insert_data(self, parsed_data: dict) -> None:
+    """
+    Inserts the parsed data from a news article or extracted comment into the DB Backend (MongoDB - pyMongo).
+    
+    Parameters: 
+        parsed_data (dict): Dictionary containing the parsed data from a news article or comment.
+    Returns:
+        None: Shows a success message if the insertion occurred normally. If not, shows an error message.
+    """
+~~~
+
+~~~python
+def check_duplicates(self, parsed_data: dict) -> bool:
+    """
+    Checks if the parsed data is already in the database and prevents from being duplicated 
+    in the crawler execution.
+    
+    Parameters: 
+        parsed_data (dict): Dictionary containing the parsed data from a news article or comment.
+    Returns:
+        bool: True if the given parsed data is already in the database. False if not.
+    """
+~~~
+
 ---
 
 <h3 style="text-align: justify;">

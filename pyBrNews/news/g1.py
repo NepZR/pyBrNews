@@ -96,7 +96,7 @@ class G1News(Crawler):
 
         return news_urls
 
-    def parse_news(self, news_urls: list, parse_body: bool = False, save_html: bool = True) -> Iterable[dict]:
+    def parse_news(self, news_urls: List[str], parse_body: bool = False, save_html: bool = True) -> Iterable[dict]:
         parsed_counter = 0
         for i, url in enumerate(news_urls):
             logger.info(f"Article {i+1} >> Parsing data at {datetime.now()}.")

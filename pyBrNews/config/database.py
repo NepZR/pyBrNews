@@ -18,6 +18,14 @@ class PyBrNewsDB:
         self.collection = self.db.get_collection(data_kind)
 
     def insert_data(self, parsed_data: dict) -> None:
+        """
+        Inserts the parsed data from a news article or extracted comment into the DB Backend (MongoDB - pyMongo).
+
+        Parameters:
+            parsed_data (dict): Dictionary containing the parsed data from a news article or comment.
+        Returns:
+            None: Shows a success message if the insertion occurred normally. If not, shows an error message.
+        """
         parsed_data["entry_dt"] = datetime.now()
 
         try:
@@ -32,6 +40,16 @@ class PyBrNewsDB:
             logger.debug(f"{traceback.print_exception(e)}")
 
     def check_duplicates(self, parsed_data: dict) -> bool:
+        """
+        Checks if the parsed data is already in the database and prevents from being duplicated
+        in the crawler execution.
+
+        Parameters:
+            parsed_data (dict): Dictionary containing the parsed data from a news article or comment.
+        Returns:
+            bool: True if the given parsed data is already in the database. False if not.
+        """
+
         check_params = {
             "url": parsed_data["url"],
             "date": parsed_data["date"],
