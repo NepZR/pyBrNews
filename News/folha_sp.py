@@ -5,14 +5,11 @@ from itertools import count
 from typing import Optional, List, Iterable
 from urllib.parse import unquote
 
-import requests.exceptions
-import urllib3.exceptions
 from loguru import logger
-from requests_html import HTMLSession, HTML
+from requests_html import HTML
 
 from News.crawler import Crawler
 
-SESSION = HTMLSession()
 XPATH_DATA = {
     'news_title': '//h1[@class="c-content-head__title"]/text()|//h1[@itemprop="headline"]/text()|'
                   '//meta[@property="og:title"]/@content|//head/title/text()',
@@ -31,20 +28,14 @@ XPATH_DATA = {
 
 class FolhaNews(Crawler):
     def __init__(self) -> None:
-        self._SEARCH_API = "https://search.folha.uol.com.br/?q={}&site=todos"
-        self._ERRORS = (
-            requests.exceptions.ReadTimeout, requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema,
-            urllib3.exceptions.ConnectionError, urllib3.exceptions.ProtocolError, ConnectionResetError,
-            requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError
-        )
+        super().__init__()
 
-    def retrieve_news(self, regions: list = None, max_pages: int = -1) -> List[str]:
-        pass
+        self._SEARCH_API = "https://search.folha.uol.com.br/?q={}&site=todos"
 
     def _make_request(self, target_url: str) -> Optional[HTML]:
         for _ in range(100):
             try:
-                response = SESSION.get(url=target_url)
+                response = self.SESSION.get(url=target_url)
                 if response.status_code == 200:
                     html_data = HTML(html=response.content, url=response.url)
                     return html_data
@@ -53,7 +44,7 @@ class FolhaNews(Crawler):
                 logger.warning(
                     f"Folha de São Paulo servers are trying to break the capture. Waiting 5 seconds before retrying."
                 )
-                SESSION.cookies.clear_session_cookies()
+                self.SESSION.cookies.clear_session_cookies()
                 time.sleep(5)
 
         return None
@@ -91,8 +82,7 @@ class FolhaNews(Crawler):
 
         return None
 
-    @staticmethod
-    def _extract_region(article_page: HTML) -> Optional[str]:
+    def _extract_region(self, article_page: HTML) -> Optional[str]:
         region = article_page.xpath(XPATH_DATA['news_region'], first=True)
         if region is not None:
             return region
@@ -144,7 +134,7 @@ class FolhaNews(Crawler):
 
         return None
 
-    def parse_news(self, news_urls: list, parse_body: bool = False) -> Iterable[dict]:
+    def parse_news(self, news_urls: list, parse_body: bool = False, save_html: bool = True) -> Iterable[dict]:
         parsed_counter = 0
         for i, url in enumerate(news_urls):
             if '1.folha.uol.com.br' not in url:
@@ -165,7 +155,7 @@ class FolhaNews(Crawler):
                 'type': self._extract_type(article_page=page),
                 'body': self._extract_body(article_page=page),
                 'id_data': self._extract_id_data(article_page=page),
-                'html': page.raw_html,
+                'html': page.raw_html if save_html else None,
             }
 
             parsed_counter += 1
@@ -214,8 +204,3 @@ class FolhaNews(Crawler):
         )
 
         return news_urls
-
-    def parse_url(self, url: str) -> dict:
-        if '1.folha.uol.com.br' in url:
-            data = [data for data in self.parse_news([url], parse_body=True)]
-            return data[0]

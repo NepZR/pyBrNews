@@ -45,6 +45,7 @@
     </tr>
 </table>
 
+> **Banco de Dados**: utilizando MongoDB (<a href="https://www.mongodb.com/docs/drivers/pymongo/">pyMongo</a>), suportado desde Outubro 28, 2022.<br><a href="https://github.com/NepZR/pyBrNews/blob/main/config/database.py"><b>Módulo responsável</b></a>: `pyBrNews.config.database.PyBrNewsDB`
 ---
 
 <h3 style="text-align: justify;">
@@ -61,6 +62,6 @@
 
 <table style="display: flex; align-itens: center; justify-content: center;">
   <tr>
-    <td align="center"><a href="https://github.com/NepZR"><img style="width: 150px; height: 150;" src="https://avatars.githubusercontent.com/u/37887926" width="100px;" alt=""/><br /><sub><b>Lucas Darlindo Freitas Rodrigues</b></sub></a><br /><sub><b>Dev. Backend Python</sub></a><br /><a href="https://www.linkedin.com/in/lucasdfr"><sub><b>LinkedIn (lucasdfr)</b></sub></a></td>
+    <td align="center"><a href="https://github.com/NepZR"><img style="width: 150px; height: 150;" src="https://avatars.githubusercontent.com/u/37887926" width="100px;" alt=""/><br /><sub><b>Lucas Darlindo Freitas Rodrigues</b></sub></a><br /><sub><b>Data Engineer | Dev. Backend Python</sub></a><br /><a href="https://www.linkedin.com/in/lucasdfr"><sub><b>LinkedIn (lucasdfr)</b></sub></a></td>
   </tr>
 <table>

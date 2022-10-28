@@ -43,6 +43,7 @@
     </tr>
 </table>
 
+> **Database**: using MongoDB (<a href="https://www.mongodb.com/docs/drivers/pymongo/">pyMongo</a>), supported since October 28th, 2022.<br><a href="https://github.com/NepZR/pyBrNews/blob/main/config/database.py"><b>Internal Module</b></a>: `pyBrNews.config.database.PyBrNewsDB`
 ---
 
 <h3 style="text-align: justify;">

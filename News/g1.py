@@ -1,17 +1,16 @@
 import json
+import re
 from datetime import datetime
+from itertools import count
+from typing import List, Iterable, Optional
 from urllib.parse import unquote
 
-import requests.exceptions
-from requests_html import HTMLSession
-from typing import Union, List, Iterable
 from loguru import logger
-from itertools import count
+from requests_html import HTML
 
 from News.crawler import Crawler
 from config import g1_api
 
-SESSION = HTMLSession()
 XPATH_DATA = {
     'news_title': '//div[@class="title"]/h1/text()|//meta[@name="title"]/@content|//head/title/text()',
     'news_date': '//time[@itemprop="datePublished"]/@datetime',
@@ -23,24 +22,18 @@ XPATH_DATA = {
 
 
 class G1News(Crawler):
-    _NEWS_API: str
-    _SEARCH_API: str
-    _API_CONFIG: dict
-
     def __init__(self) -> None:
-        self._API_CONFIG = g1_api.news_config
+        super().__init__()
 
+        self._API_CONFIG = g1_api.news_config
         self._NEWS_API = self._API_CONFIG['api_url']['news_engine']
         self._SEARCH_API = self._API_CONFIG['api_url']['search_engine']
-        self._ERRORS = (
-            requests.exceptions.ReadTimeout, requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema
-        )
 
     def _retrieve_news_by_region(self, regions: list, max_pages: int = -1) -> Iterable[str]:
         for region in regions:
             for i in count():
                 try:
-                    page = SESSION.get(
+                    page = self.SESSION.get(
                         self._NEWS_API.format(self._API_CONFIG['regions'][region], str(i + 1))
                     ).json()
                 except json.decoder.JSONDecodeError:
@@ -69,7 +62,7 @@ class G1News(Crawler):
     def _retrieve_news_brazil(self, max_pages: int = -1) -> Iterable[str]:
         for i in count():
             try:
-                page = SESSION.get(
+                page = self.SESSION.get(
                     self._NEWS_API.format(self._API_CONFIG['regions']['brasil'], str(i + 1))
                 ).json()
             except json.decoder.JSONDecodeError:
@@ -93,7 +86,7 @@ class G1News(Crawler):
             if i+1 == max_pages:
                 break
 
-    def retrieve_news(self, regions: list = None, max_pages: int = -1) -> List[str]:
+    def retrieve_latest_news(self, regions: list = None, max_pages: int = -1) -> List[str]:
         news_urls = []
         if regions is None:
             news_urls = [url for url in self._retrieve_news_brazil(max_pages=max_pages)]
@@ -103,77 +96,43 @@ class G1News(Crawler):
 
         return news_urls
 
-    def parse_news(self, news_urls: list, parse_body: bool = False) -> Iterable[dict]:
+    def parse_news(self, news_urls: list, parse_body: bool = False, save_html: bool = True) -> Iterable[dict]:
         parsed_counter = 0
         for i, url in enumerate(news_urls):
             logger.info(f"Article {i+1} >> Parsing data at {datetime.now()}.")
+            page = self.SESSION.get(url).html
+
             parsed_news = {
-                'title': str,
-                'abstract': str,
-                'date': Union[datetime, str, None],
-                'section': str,
-                'region': str,
+                'title': self._extract_title(article_page=page),
+                'abstract': self._extract_abstract(article_page=page),
+                'date': self._extract_date(article_page=page),
+                'section': self._extract_section(article_page=page),
+                'region': self._extract_region(article_url=url),
                 'url': url,
-                'platform': 'G1',
-                'tags': str,
-                'type': str,
-                'body': str,
-                'html': bytes,
+                'platform': 'Portal G1',
+                'tags': self._extract_tags(article_page=page),
+                'type': self._extract_type(article_url=url),
+                'body': self._extract_body(article_page=page),
+                'id_data': None,
+                'html': page.raw_html if save_html else None,
             }
-            try:
-                page = SESSION.get(url)
-                parsed_news['title'] = page.html.xpath(
-                    XPATH_DATA['news_title'], first=True
-                )
 
-                parsed_news['abstract'] = page.html.xpath(
-                    XPATH_DATA['news_abstract'], first=True
-                )
+            parsed_counter += 1
 
-                raw_date = page.html.xpath(XPATH_DATA['news_date'], first=True)
-                if raw_date is not None:
-                    parsed_news['date'] = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
-                else:
-                    parsed_news['date'] = None
-
-                parsed_news['section'] = page.html.xpath(
-                    XPATH_DATA['news_section'], first=True
-                )
-
-                parsed_news['region'] = url.split('/')[3].upper() if url.split(
-                    '/')[3] in self._API_CONFIG['regions'].keys() else 'N/A'
-
-                parsed_news['tags'] = '|'.join(
-                    page.html.xpath(XPATH_DATA['news_tags'])
-                ) if len(page.html.xpath(XPATH_DATA['news_tags'])) != 0 else 'N/A'
-
-                parsed_news['type'] = 'Vídeo' if "video" in parsed_news['url'] else "Notícia"
-
-                parsed_news['body'] = ''.join(page.html.xpath(
-                    XPATH_DATA['news_body']
-                )) if parse_body and len(page.html.xpath(XPATH_DATA['news_body'])) > 0 else None
-
-                parsed_news['html'] = page.content
-
-                parsed_counter += 1
-
-                logger.success(f"Article {i+1} >> Data parsed successfully!.")
-                yield parsed_news
-            except self._ERRORS as error:
-                logger.error(f'Error parsing data from the page. Skipping. Error: {error}')
-                continue
+            logger.success(f"Article {i+1} >> Data parsed successfully!.")
+            yield parsed_news
 
         logger.success(
             f"All the data have been parsed successfully! "
             f"{parsed_counter} of {len(news_urls)} news had the data extracted."
         )
 
-    def search_news(self, keywords: list, max_pages: int = -1) -> List[str]:
+    def search_news(self, keywords: List[str], max_pages: int = -1) -> List[str]:
         news_urls = []
         for keyword in keywords:
             logger.info(f"Retrieving news from G1 associated with the Keyword \"{keyword}\".")
             for i in count():
-                page = SESSION.get(self._SEARCH_API.format(keyword, str(i+1)))
+                page = self.SESSION.get(self._SEARCH_API.format(keyword, str(i+1)))
                 if "page" not in page.url:
                     break
 
@@ -191,7 +150,73 @@ class G1News(Crawler):
 
         return news_urls
 
-    def parse_url(self, url: str) -> dict:
-        if 'g1.globo.com' in url:
-            data = [data for data in self.parse_news([url], parse_body=True)]
-            return data[0]
+    @staticmethod
+    def _extract_title(article_page: HTML) -> Optional[str]:
+        title = article_page.xpath(XPATH_DATA['news_title'], first=True)
+        if title is not None:
+            return title
+
+        return None
+
+    @staticmethod
+    def _extract_abstract(article_page: HTML) -> Optional[str]:
+        abstract = article_page.xpath(XPATH_DATA['news_abstract'], first=True)
+        if abstract is not None:
+            return abstract
+
+        return None
+
+    @staticmethod
+    def _extract_date(article_page: HTML) -> Optional[datetime]:
+        raw_date = article_page.xpath(XPATH_DATA['news_date'], first=True)
+        if raw_date is not None:
+            try:
+                published_date = datetime.strptime(raw_date, "%Y-%m-%dT%H:%M:%S.%fZ")
+                return published_date
+            except ValueError:
+                return None
+
+        return None
+
+    @staticmethod
+    def _extract_section(article_page: HTML) -> Optional[str]:
+        section = article_page.xpath(XPATH_DATA['news_section'], first=True)
+        if section is not None:
+            return section
+
+        return None
+
+    def _extract_region(self, article_url: str) -> Optional[str]:
+        region = article_url.split('/')[3]
+        if region in self._API_CONFIG['regions'].keys():
+            region = region.upper()
+            return region
+
+        return None
+
+    @staticmethod
+    def _extract_tags(article_page: HTML) -> Optional[str]:
+        tags = article_page.xpath(XPATH_DATA['news_tags'], first=True)
+        if tags is not None:
+            return tags
+
+        return None
+
+    @staticmethod
+    def _extract_type(article_url: HTML) -> Optional[str]:
+        if "video" in article_url:
+            news_type = "Video"
+        else:
+            news_type = "Article"
+
+        return news_type
+
+    @staticmethod
+    def _extract_body(article_page: HTML) -> Optional[str]:
+        article_body = article_page.xpath(XPATH_DATA['news_body'])
+        if article_body is not None:
+            body = ' '.join(article_body)
+            re.sub(r"(\s{2,})|(\n)+", body, "")
+            return body
+
+        return None

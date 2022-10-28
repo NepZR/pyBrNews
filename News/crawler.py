@@ -1,38 +1,64 @@
-import csv
-import json
 from abc import ABC, abstractmethod
 from datetime import datetime
+from typing import Optional
+
+import requests.exceptions
+import urllib3.exceptions
+from requests_html import HTMLSession, HTML
 
 
 class Crawler(ABC):
-    @abstractmethod
-    def retrieve_news(self, max_pages: int = -1, regions: list = None):
-        pass
+    def __init__(self) -> None:
+        self.SESSION = HTMLSession()
+        self._ERRORS = (
+            requests.exceptions.ReadTimeout, requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema,
+            urllib3.exceptions.ConnectionError, urllib3.exceptions.ProtocolError, ConnectionResetError,
+            requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError
+        )
 
     @abstractmethod
-    def parse_news(self, news_urls: list, parse_body: bool = False):
+    def parse_news(self, news_urls: list, parse_body: bool = False, save_html: bool = True):
         pass
 
     @abstractmethod
     def search_news(self, keywords: list, max_pages: int = -1):
         pass
 
+    @staticmethod
     @abstractmethod
-    def parse_url(self, url: str):
+    def _extract_title(article_page: HTML) -> Optional[str]:
         pass
 
     @staticmethod
-    def export_data(parsed_data: list, export_type: str = 'csv'):
-        export_time = datetime.today().strftime('%Y_%m_%d_%HH_%MM')
-        if len(parsed_data) == 0:
-            raise ValueError(f'parsed_data ({export_type}) cannot be empty.')
-        if ('csv' not in export_type.lower()) and ('json' not in export_type.lower()):
-            raise ValueError(f'{export_type} is not a valid export format.')
-        with open(f'ParsedNewsData_{export_time}.{export_type}', 'w', encoding='utf-8') as export_file:
-            if export_type.lower() == 'csv':
-                header = ['title', 'abstract', 'date', 'section', 'region', 'url', 'platform', 'content']
-                writer = csv.DictWriter(export_file, fieldnames=header)
-                writer.writeheader()
-                writer.writerows(parsed_data)
-            else:
-                json.dump(parsed_data, export_file, ensure_ascii=False, indent=4)
+    @abstractmethod
+    def _extract_abstract(article_page: HTML) -> Optional[str]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def _extract_date(article_page: HTML) -> Optional[datetime]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def _extract_section(article_page: HTML) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    def _extract_region(self, article_page: HTML) -> Optional[str]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def _extract_tags(article_page: HTML) -> Optional[str]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def _extract_type(article_page: HTML) -> Optional[str]:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def _extract_body(article_page: HTML) -> Optional[str]:
+        pass

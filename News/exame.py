@@ -1,18 +1,13 @@
-import re
 import time
 from datetime import datetime
 from itertools import count
 from typing import Optional, List, Iterable
-from urllib.parse import unquote
 
-import requests.exceptions
-import urllib3.exceptions
 from loguru import logger
-from requests_html import HTMLSession, HTML
+from requests_html import HTML
 
 from News.crawler import Crawler
 
-SESSION = HTMLSession()
 XPATH_DATA = {
     'news_abstract': '//meta[@property="og:description"]/@content|//meta[@name="description"]/@content',
     'news_body': '//div[@id="news-body"]',
@@ -22,20 +17,14 @@ XPATH_DATA = {
 
 class ExameNews(Crawler):
     def __init__(self) -> None:
-        self._SEARCH_API = "https://content-api.exame.com/api/xm/wp/v2/news"
-        self._ERRORS = (
-            requests.exceptions.ReadTimeout, requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema,
-            urllib3.exceptions.ConnectionError, urllib3.exceptions.ProtocolError, ConnectionResetError,
-            requests.exceptions.ConnectionError, requests.exceptions.ChunkedEncodingError
-        )
+        super().__init__()
 
-    def retrieve_news(self, regions: list = None, max_pages: int = -1) -> List[str]:
-        pass
+        self._SEARCH_API = "https://content-api.exame.com/api/xm/wp/v2/news"
 
     def _get_article(self, article_url: str) -> Optional[HTML]:
         for _ in range(100):
             try:
-                response = SESSION.get(url=article_url)
+                response = self.SESSION.get(url=article_url)
                 if response.status_code == 200:
                     html_data = HTML(html=response.content, url=article_url)
                     return html_data
@@ -60,7 +49,7 @@ class ExameNews(Crawler):
 
         for _ in range(100):
             try:
-                response = SESSION.get(url=self._SEARCH_API, params=search_params)
+                response = self.SESSION.get(url=self._SEARCH_API, params=search_params)
                 if response.status_code != 200:
                     return None
 
@@ -70,7 +59,7 @@ class ExameNews(Crawler):
                 logger.warning(
                     f"Exame servers are trying to break the capture. Waiting 5 seconds before retrying."
                 )
-                SESSION.cookies.clear_session_cookies()
+                self.SESSION.cookies.clear_session_cookies()
                 time.sleep(5)
 
         return None
@@ -125,6 +114,10 @@ class ExameNews(Crawler):
 
         return None
 
+    def _extract_region(self, article_page: HTML) -> Optional[str]:
+        region = None
+        return region
+
     @staticmethod
     def _extract_body(article_page: HTML) -> Optional[str]:
         article_body = article_page.xpath(XPATH_DATA['news_body'], first=True)
@@ -142,7 +135,7 @@ class ExameNews(Crawler):
 
         return None
 
-    def parse_news(self, news_urls: list, parse_body: bool = False) -> Iterable[dict]:
+    def parse_news(self, news_urls: List[dict], parse_body: bool = False, save_html: bool = True) -> Iterable[dict]:
         parsed_counter = 0
         for i, article_data in enumerate(news_urls):
             if article_data is None:
@@ -160,14 +153,14 @@ class ExameNews(Crawler):
                 'abstract': self._extract_abstract(article_page=page),
                 'date': self._extract_date(article_data=article_data),
                 'section': self._extract_section(article_data=article_data),
-                'region':  "N/A",
+                'region':  self._extract_region(article_page=page),
                 'url': url,
                 'platform': 'Exame',
                 'tags': self._extract_tags(article_data=article_data),
                 'type': self._extract_type(article_page=page),
                 'body': self._extract_body(article_page=page),
                 'id_data': self._extract_id(article_data=article_data),
-                'html': page.raw_html,
+                'html': page.raw_html if save_html else None,
             }
 
             parsed_counter += 1
@@ -198,7 +191,10 @@ class ExameNews(Crawler):
                     break
 
                 for item in search_data:
-                    if "exame.com" in item['link']:
+                    if "link" not in item.keys():
+                        continue
+
+                    if "exame.com" in item["link"]:
                         articles.append(item)
 
                 if i+1 == max_pages:
@@ -212,8 +208,3 @@ class ExameNews(Crawler):
         )
 
         return articles
-
-    def parse_url(self, url: str) -> dict:
-        if '1.folha.uol.com.br' in url:
-            data = [data for data in self.parse_news([url], parse_body=True)]
-            return data[0]
