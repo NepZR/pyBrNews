@@ -6,7 +6,7 @@ from loguru import logger
 
 
 class PyBrNewsDB:
-    def __init__(self, data_kind: str) -> None:
+    def __init__(self, data_kind: str = "news") -> None:
         if "news" not in data_kind and "comments" not in data_kind:
             raise ValueError(
                 f"An invalid kind of data for database [ {data_kind} ] was supplied. Review and try again."
@@ -30,3 +30,15 @@ class PyBrNewsDB:
             logger.error(f"An error happened while attempting to insert the given data to the pyBrNews database.")
             logger.debug(f"Data URL: {parsed_data['url']}")
             logger.debug(f"{traceback.print_exception(e)}")
+
+    def check_duplicates(self, parsed_data: dict) -> bool:
+        check_params = {
+            "url": parsed_data["url"],
+            "date": parsed_data["date"],
+        }
+
+        documents = self.collection.find_one(check_params)
+        if documents is None:
+            return False
+
+        return True

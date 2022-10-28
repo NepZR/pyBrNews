@@ -6,10 +6,13 @@ import requests.exceptions
 import urllib3.exceptions
 from requests_html import HTMLSession, HTML
 
+from ..config.database import PyBrNewsDB
+
 
 class Crawler(ABC):
     def __init__(self) -> None:
         self.SESSION = HTMLSession()
+        self._DB = PyBrNewsDB()
         self._ERRORS = (
             requests.exceptions.ReadTimeout, requests.exceptions.InvalidSchema, requests.exceptions.MissingSchema,
             urllib3.exceptions.ConnectionError, urllib3.exceptions.ProtocolError, ConnectionResetError,

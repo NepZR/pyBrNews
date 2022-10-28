@@ -117,9 +117,12 @@ class G1News(Crawler):
                 'html': page.raw_html if save_html else None,
             }
 
-            parsed_counter += 1
+            if self._DB.check_duplicates(parsed_data=parsed_news):
+                continue
 
-            logger.success(f"Article {i+1} >> Data parsed successfully!.")
+            parsed_counter += 1
+            logger.success(f"Article {i + 1} >> Data parsed successfully!.")
+
             yield parsed_news
 
         logger.success(
