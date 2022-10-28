@@ -8,8 +8,8 @@ from urllib.parse import unquote
 from loguru import logger
 from requests_html import HTML
 
-from news.crawler import Crawler
-from config import g1_api
+from .crawler import Crawler
+from ..config import g1_api
 
 XPATH_DATA = {
     'news_title': '//div[@class="title"]/h1/text()|//meta[@name="title"]/@content|//head/title/text()',

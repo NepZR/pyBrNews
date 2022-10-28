@@ -1,7 +1,7 @@
 from loguru import logger
 
-from news.g1 import G1News
-from config.database import PyBrNewsDB
+from pyBrNews.news.g1 import G1News
+from pyBrNews.config.database import PyBrNewsDB
 
 if __name__ == '__main__':
     crawler = G1News()
