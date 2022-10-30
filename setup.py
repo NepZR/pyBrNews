@@ -11,7 +11,7 @@ setup(
     install_requires=[
         "loguru>=0.6.0", "pymongo>=4.3.2", "requests_html>=0.10.0"
     ],
-    version='0.1.1',
+    version='0.1.2',
     description='A Brazilian News Website Data Acquisition Library for Python',
     long_description=readme,
     long_description_content_type="text/markdown",
