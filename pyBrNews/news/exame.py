@@ -16,8 +16,8 @@ XPATH_DATA = {
 
 
 class ExameNews(Crawler):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, use_database: bool = True) -> None:
+        super().__init__(use_database=use_database)
 
         self._SEARCH_API = "https://content-api.exame.com/api/xm/wp/v2/news"
 
@@ -163,7 +163,7 @@ class ExameNews(Crawler):
                 'html': page.raw_html if save_html else None,
             }
 
-            if self._DB.check_duplicates(parsed_data=parsed_news):
+            if self.DB.check_duplicates(parsed_data=parsed_news):
                 continue
 
             parsed_counter += 1

@@ -27,8 +27,8 @@ XPATH_DATA = {
 
 
 class FolhaNews(Crawler):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, use_database: bool = True) -> None:
+        super().__init__(use_database=use_database)
 
         self._SEARCH_API = "https://search.folha.uol.com.br/?q={}&site=todos"
 
@@ -98,8 +98,8 @@ class FolhaNews(Crawler):
         return None
 
     @staticmethod
-    def _extract_type(article_page: HTML) -> Optional[str]:
-        news_type = article_page.xpath(XPATH_DATA['news_type'], first=True)
+    def _extract_type(article_data: HTML) -> Optional[str]:
+        news_type = article_data.xpath(XPATH_DATA['news_type'], first=True)
         if news_type is not None:
             return news_type
 
@@ -156,13 +156,13 @@ class FolhaNews(Crawler):
                 'url': url,
                 'platform': 'Folha de São Paulo',
                 'tags': self._extract_tags(article_page=page),
-                'type': self._extract_type(article_page=page),
+                'type': self._extract_type(article_data=page),
                 'body': self._extract_body(article_page=page),
                 'id_data': self._extract_id_data(article_page=page),
                 'html': page.raw_html if save_html else None,
             }
 
-            if self._DB.check_duplicates(parsed_data=parsed_news):
+            if self.DB.check_duplicates(parsed_data=parsed_news):
                 continue
 
             parsed_counter += 1

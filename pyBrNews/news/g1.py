@@ -22,8 +22,8 @@ XPATH_DATA = {
 
 
 class G1News(Crawler):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, use_database: bool = True) -> None:
+        super().__init__(use_database=use_database)
 
         self._API_CONFIG = g1_api.news_config
         self._NEWS_API = self._API_CONFIG['api_url']['news_engine']
@@ -110,14 +110,14 @@ class G1News(Crawler):
                 'region': self._extract_region(article_url=url),
                 'url': url,
                 'platform': 'Portal G1',
-                'tags': self._extract_tags(article_page=page),
+                'tags': self._extract_tags(article_data=page),
                 'type': self._extract_type(article_url=url),
                 'body': self._extract_body(article_page=page),
                 'id_data': None,
                 'html': page.raw_html if save_html else None,
             }
 
-            if self._DB.check_duplicates(parsed_data=parsed_news):
+            if self.DB.check_duplicates(parsed_data=parsed_news):
                 continue
 
             parsed_counter += 1
@@ -198,15 +198,15 @@ class G1News(Crawler):
         return None
 
     @staticmethod
-    def _extract_tags(article_page: HTML) -> Optional[str]:
-        tags = article_page.xpath(XPATH_DATA['news_tags'], first=True)
+    def _extract_tags(article_data: HTML) -> Optional[str]:
+        tags = article_data.xpath(XPATH_DATA['news_tags'], first=True)
         if tags is not None:
             return tags
 
         return None
 
     @staticmethod
-    def _extract_type(article_url: HTML) -> Optional[str]:
+    def _extract_type(article_url: str) -> Optional[str]:
         if "video" in article_url:
             news_type = "Video"
         else:
