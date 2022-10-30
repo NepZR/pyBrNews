@@ -32,6 +32,14 @@ class PyBrNewsDB:
         self.collection = self.db.get_collection(data_kind)
 
     def set_connection(self, host: str = "localhost", port: int = 27017) -> None:
+        """
+        Sets the connection host:port parameters for the MongoDB. By default, uses the standard localhost:27017 for
+        local usage.
+
+        Parameters:
+             host (str): Hostname or address to connect.
+             port (int): Port to be used in the connection.
+        """
         self.client = pymongo.MongoClient(host=host, port=port)
         self.db = self.client.get_database(name="pyBrNews")
 
@@ -115,10 +123,14 @@ class PyBrNewsFS:
             raise AttributeError("Parsed Data Dictionary cannot be an NoneType value.")
 
         export_time = datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
-        file_name = f"ParsedNewsData_{export_time}.csv"
+        file_name = f"ParsedNewsData_{export_time}.json"
         try:
             with open(f"{self.save_path}{file_name}", mode="w", encoding="utf-8") as json_file:
                 json.dump(parsed_data, json_file, ensure_ascii=False, indent=4)
+
+            logger.success(
+                f"Data saved successfully as a JSON file! Document path: {self.save_path}{file_name}"
+            )
         except OSError:
             logger.error(
                 "An error occurred while attempting to save the JSON file. Review the save path and the data, and try "
@@ -181,6 +193,10 @@ class PyBrNewsFS:
                 writer = csv.DictWriter(export_file, fieldnames=header)
                 writer.writeheader()
                 writer.writerows(export_data)
+
+            logger.success(
+                f"All data exported successfully as a CSV file! Document path: {self.save_path}{file_name}"
+            )
         except OSError:
             logger.error(
                 "An error occurred while attempting to save the CSV file. Review the save path and the data, and try "
