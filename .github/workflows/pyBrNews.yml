@@ -1,12 +1,8 @@
 name: PyPI Release - pyBrNews
 
 on:
-  push:
-    branches: [master]
-    tags: ["v*.*.*"]
-  pull_request:
-    branches: [master]
   release:
+    tags: ["v*.*.*"]
     types:
       - published
 
