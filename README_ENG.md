@@ -9,6 +9,8 @@
 
 <h5>🇧🇷 Você está lendo a versão em Inglês deste README. Para ler a versão em Português Brasileiro, <a href="https://github.com/NepZR/pyBrNews/blob/main/README.md">clique aqui</a>.</h5>
 
+<h4 style="color: red">About this branch [`college/app-project`]: used specifically as a project for Database Architecture and Performance class on college and does not reflect future features for this library.</h4>
+
 ---
 
 ### 📲 Installation

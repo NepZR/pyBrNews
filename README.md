@@ -8,6 +8,8 @@
 
  <h5>🇺🇸 You are reading the Portuguese Brazilian version of this README. To read the English version, click <a href="https://github.com/NepZR/pyBrNews/blob/main/README_ENG.md">here</a>.</h5>
 
+<h4 style="color: red">Sobre esta branch [`college/app-project`]: dedicada exclusivamente para o projeto da disciplina de Arquitetura e Desempenho de Banco de Dados e não reflete recursos que podem subir para produção.</h4>
+
 ---
 
 ### 📲 Instalação
