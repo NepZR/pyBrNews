@@ -8,7 +8,7 @@
 
  <h5>🇺🇸 You are reading the Portuguese Brazilian version of this README. To read the English version, click <a href="https://github.com/NepZR/pyBrNews/blob/main/README_ENG.md">here</a>.</h5>
 
-<h4 style="color: red">Sobre esta branch [`college/app-project`]: dedicada exclusivamente para o projeto da disciplina de Arquitetura e Desempenho de Banco de Dados e não reflete recursos que podem subir para produção.</h4>
+<h4 style="color: red">Sobre esta branch [`college/app-project`]: dedicada exclusivamente para o projeto da disciplina de Arquitetura e Desempenho de Banco de Dados e não reflete recursos que podem subir para produção. A única exceção é o suporte ao ElasticSearch, que será trazido para a `master` depois de totalmente testado.</h4>
 
 ---
 
@@ -50,7 +50,7 @@
     <tr>
       <td>Portal G1</td>
       <td>✅ Funcional</td>
-      <td>⌨️ Em desenvolvimento</td>
+      <td>🚧️ Em pausa</td>
       <td><a href="https://g1.globo.com/">Link</a></td>
     </tr>
     <tr>
@@ -67,15 +67,15 @@
     </tr>
     <tr>
       <td>Metrópoles</td>
-      <td>⌨️ Em desenvolvimento</td>
-      <td>⌨️ Em desenvolvimento</td>
+      <td>🚧️ Em pausa</td>
+      <td>🚧️ Em pausa</td>
       <td><a href="https://www.metropoles.com/">Link</a></td>
     </tr>
 </table>
 
-> **Banco de Dados**: utilizando MongoDB (<a href="https://www.mongodb.com/docs/drivers/pymongo/">pyMongo</a>), suportado desde Outubro 28, 2022. Também com suporte a sistema de arquivos local (JSON / CSV), desde Outubro 30, 2022.<br><a href="https://github.com/NepZR/pyBrNews/blob/main/config/database.py"><b>Módulos responsáveis</b></a>: `pyBrNews.config.database.PyBrNewsDB` e `pyBrNews.config.database.PyBrNewsFS`
+> **Banco de Dados**: <br>- Utilizando MongoDB (<a href="https://www.mongodb.com/docs/drivers/pymongo/">pyMongo</a>), suportado desde Outubro 28, 2022. Também com suporte a sistema de arquivos local (JSON / CSV), desde Outubro 30, 2022.<br><b style="color: limegreen">Novidade:</b><br> - Adicionado suporte para o ElasticSearch (<a href="https://opensearch.org/docs/latest/clients/python/">opensearchpy</a>) com migração de dados de duas vias (MongoDB para ElasticSearch e vice-versa), desde Dezembro 20, 2022.<br><a href="https://github.com/NepZR/pyBrNews/blob/main/config/database.py"><b>Módulos responsáveis</b></a>:<br> `pyBrNews.config.database.PyBrNewsDB`, `pyBrNews.config.database.PyBrNewsFS`, `pyBrNews.config.database.PyBrNewsES` e `pyBrNews.config.database.PyBrNewsDBMigration`.
 
-> **Informações adicionais:** para utilizar o sistema de armazenamento de arquivos localmente (JSON / CSV), defina o parâmetro `use_database=False` nos crawlers do pacote `news`. Exemplo: `crawler = pyBrNews.news.g1.G1News(use_database=False)`. Por padrão, está definido como `True` e utiliza a base de dados do MongoDB da classe `PyBrNewsDB`. 
+> **Informações adicionais:**<br> - Para utilizar o sistema de armazenamento de arquivos localmente (JSON / CSV), defina o parâmetro `use_database=False` nos crawlers do pacote `news`. Exemplo: `crawler = pyBrNews.news.g1.G1News(use_database=False)`. Por padrão, está definido como `True` e utiliza a base de dados do MongoDB da classe `PyBrNewsDB`. 
 ---
 
 <h3 style="text-align: justify;">

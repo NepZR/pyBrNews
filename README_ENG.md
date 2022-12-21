@@ -9,7 +9,7 @@
 
 <h5>🇧🇷 Você está lendo a versão em Inglês deste README. Para ler a versão em Português Brasileiro, <a href="https://github.com/NepZR/pyBrNews/blob/main/README.md">clique aqui</a>.</h5>
 
-<h4 style="color: red">About this branch [`college/app-project`]: used specifically as a project for Database Architecture and Performance class on college and does not reflect future features for this library.</h4>
+<h4 style="color: red">About this branch [`college/app-project`]: used specifically as a project for Database Architecture and Performance class on college and does not reflect future features for this library. The only exception is the ElasticSearch support, which is going to be merged to `master` when fully tested.</h4>
 
 ---
 
@@ -52,7 +52,7 @@
     <tr>
       <td>Portal G1</td>
       <td>✅ Working</td>
-      <td>⌨️ In progress</td>
+      <td>🚧️ Dev. Paused</td>
       <td><a href="https://g1.globo.com/">Link</a></td>
     </tr>
     <tr>
@@ -69,15 +69,15 @@
     </tr>
     <tr>
       <td>Metrópoles</td>
-      <td>⌨️ In progress</td>
-      <td>⌨️ In progress</td>
+      <td>🚧️ Dev. Paused</td>
+      <td>🚧️ Dev. Paused</td>
       <td><a href="https://www.metropoles.com/">Link</a></td>
     </tr>
 </table>
 
-> **Database**: using MongoDB (<a href="https://www.mongodb.com/docs/drivers/pymongo/">pyMongo</a>), supported since October 28th, 2022. Also supports local File System storage (JSON / CSV) since October 30, 2022.<br><a href="https://github.com/NepZR/pyBrNews/blob/main/config/database.py"><b>Internal Modules</b></a>: `pyBrNews.config.database.PyBrNewsDB` and `pyBrNews.config.database.PyBrNewsFS`
+> **Database**:<br> - Using MongoDB (<a href="https://www.mongodb.com/docs/drivers/pymongo/">pyMongo</a>), supported since October 28th, 2022. Also supports local File System storage (JSON / CSV) since October 30th, 2022.<br><b style="color: limegreen">Recently Added:</b><br> - ElasticSearch Support added (<a href="https://opensearch.org/docs/latest/clients/python/">opensearchpy</a>) with Two-Way Data Migration Module (MongoDB Data to ElasticSearch, and vice-versa) since December 20th, 2022.<br><a href="https://github.com/NepZR/pyBrNews/blob/main/config/database.py"><b>Internal Modules</b></a>:<br> `pyBrNews.config.database.PyBrNewsDB`, `pyBrNews.config.database.PyBrNewsFS`, `pyBrNews.config.database.PyBrNewsES`, and `pyBrNews.config.database.PyBrNewsDBMigration`
 
-> **Additional Info:** to use a local file system storage (JSON / CSV), set the parameter `use_database=False` in the news package crawlers. Example: `crawler = pyBrNews.news.g1.G1News(use_database=False)`. By default, is `True` and uses the MongoDB database from PyBrNewsDB class.
+> **Additional Info:**<br> - To use a local file system storage (JSON / CSV), set the parameter `use_database=False` in the news package crawlers. Example: `crawler = pyBrNews.news.g1.G1News(use_database=False)`. By default, is `True` and uses the MongoDB database from PyBrNewsDB class.
 ---
 
 <h3 style="text-align: justify;">
