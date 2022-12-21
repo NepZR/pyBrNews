@@ -2,7 +2,7 @@ import csv
 import json
 import traceback
 from datetime import datetime
-from typing import List, Iterable, Optional, Union, Tuple
+from typing import List, Iterable, Optional, Union, Tuple, Any
 
 import pymongo
 import pymongo.database
@@ -29,6 +29,8 @@ class PyBrNewsDB:
 
         self.client: Optional[pymongo.MongoClient] = None
         self.db: Optional[pymongo.database.Database] = None
+        self.host = host
+        self.port = port
 
         self.set_connection(host=host, port=port)
         self.collection = self.db.get_collection(data_kind)
@@ -72,7 +74,7 @@ class PyBrNewsDB:
             self,
             origin: Optional[List[str]] = None,
             search_query: Optional[str] = None,
-            init_final_year: Optional[Tuple[int]] = None,
+            init_final_year: Optional[Tuple[Any, Any]] = None,
             limit: int = 10
     ) -> Iterable[dict]:
         query = {}
@@ -128,7 +130,7 @@ class PyBrNewsDB:
         return True
 
     @staticmethod
-    def _query_constructor(args: Optional[List[Union[List[str], Tuple[int], str]]] = None) -> dict:
+    def _query_constructor(args: Optional[List[Union[List[str], Tuple[Any, Any], str]]] = None) -> dict:
         query = {}
         if args is None:
             return query
@@ -138,7 +140,8 @@ class PyBrNewsDB:
                 sharded_search = arg.split(" ")
                 fields = ["title", "abstract", "body", "search_keyword"]
                 _filter = "or" if "and" not in sharded_search else "and"
-                del sharded_search[sharded_search.index(_filter)]
+                if "and" in _filter:
+                    del sharded_search[sharded_search.index(_filter)]
 
                 if f"${_filter}" not in query.keys():
                     query[f"${_filter}"] = []
@@ -148,8 +151,8 @@ class PyBrNewsDB:
 
             elif type(arg) is tuple:
                 query["date"] = {
-                    "$gte": datetime(year=int(arg[0]), month=1, day=1),
-                    "$lte": datetime(year=int(arg[1]), month=12, day=31)
+                    "$gte": arg[0],
+                    "$lte": arg[1]
                 }
 
             elif type(arg) is list:
@@ -185,6 +188,8 @@ class PyBrNewsES:
             )
 
         self.db = self.set_connection(host=host, port=port, credentials=credentials)
+        self.host = host
+        self.port = port
         self.index = "pybrnews_news" if "news" in data_kind else "pybrnews_comments"
 
     @staticmethod
@@ -211,14 +216,14 @@ class PyBrNewsES:
 
         return database
 
-    def insert_data(self, parsed_data: dict) -> dict:
+    def insert_data(self, parsed_data: dict) -> None:
         """
         Inserts the parsed data from a news article or extracted comment into the DB Backend (MongoDB - pyMongo).
 
         Parameters:
             parsed_data (dict): Dictionary containing the parsed data from a news article or comment.
         Returns:
-            dict: Shows a success message and the insertion result if successfull. If not, shows an error message.
+            None: Shows a success message and the insertion result if successfull. If not, shows an error message.
         """
         parsed_data["entry_dt"] = datetime.now()
 
@@ -238,7 +243,7 @@ class PyBrNewsES:
             self,
             origin: Optional[List[str]] = None,
             search_query: Optional[str] = None,
-            init_final_year: Optional[Tuple[int]] = None,
+            init_final_year: Optional[Tuple[Any, Any]] = None,
             limit: int = 10
     ) -> Iterable[dict]:
         if origin is None and search_query is None and init_final_year is None:
@@ -251,7 +256,8 @@ class PyBrNewsES:
         ) if query is None else self.db.search(index=self.index, body=query, size=limit)
 
         for data in query_response["hits"]["hits"]:
-            yield data
+            data["_source"]["_id"] = data["_id"]
+            yield data["_source"]
 
     def update_data(self, payload: dict, doc_id: str) -> dict:
         updated_data = self.db.update(id=doc_id, body={"doc": payload}, index=self.index)
@@ -297,12 +303,10 @@ class PyBrNewsES:
         return True
 
     @staticmethod
-    def _query_constructor(args: Optional[List[Union[List[str], Tuple[int], str]]] = None) -> Optional[dict]:
+    def _query_constructor(args: Optional[List[Union[List[str], Tuple[Any, Any], str]]] = None) -> Optional[dict]:
         query = {
             "query": {
-                "query_string": {},
-                "range": {},
-                "must": []
+                "bool": {"must": []}
             }
         }
         if args is None:
@@ -311,24 +315,26 @@ class PyBrNewsES:
         for arg in args:
             if type(arg) is str:
                 sharded_search = arg.split(" ")
-                fields = ["title", "abstract", "body", "search_keyword"]
+                fields = ["title", "abstract", "body", "search_keyword.keyword"]
                 _filter = "or" if "and" not in sharded_search else "and"
-                del sharded_search[sharded_search.index(_filter)]
+                if "and" in _filter:
+                    del sharded_search[sharded_search.index(_filter)]
 
                 search_query = f" {_filter.upper()} ".join(sharded_search)
-                query["query"]["query_string"]["query"] = search_query
-                query["query"]["query_string"]["fields"] = fields
+                query["query"]["bool"]["must"].append({"query_string": {"query": search_query, "fields": fields}})
+
             elif type(arg) is tuple:
-                query["query"]["range"].update({
-                    "gte": datetime(year=int(arg[0]), month=1, day=1),
-                    "lte": datetime(year=int(arg[1]), month=12, day=31)
-                })
+                must_range = {"range": {"date": {"gte": arg[0], "lte": arg[1]}}}
+                query["query"]["bool"]["must"].append(must_range)
 
             elif type(arg) is list:
-                query["query"]["must"].append({"match": {"platform.keyword": plat}} for plat in arg)
+                for plat in arg:
+                    query["query"]["bool"]["must"].append({"match": {"platform.keyword": plat}})
+
             else:
                 logger.warning("Passed parameters does not match any of the accepted ones. Using default query option.")
 
+        print(query)
         return query
 
 
