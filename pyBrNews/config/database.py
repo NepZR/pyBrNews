@@ -86,13 +86,13 @@ class PyBrNewsDB:
         for data in self.collection.find(query).limit(limit):
             yield data
 
-    def update_data(self, payload: dict) -> dict:
-        data_id = str(payload.pop("_id"))
+    def update_data(self, payload: dict, doc_id: str) -> dict:
         updated_data = self.collection.find_one_and_update(
-            filter={"_id": data_id},
-            update=payload
+            filter={"_id": doc_id},
+            update={"$set": payload}
         )
 
+        logger.success(updated_data)
         return updated_data
 
     def delete_data(self, doc_id: str, make_backup: bool = False) -> dict:
@@ -100,13 +100,14 @@ class PyBrNewsDB:
         if make_backup:
             data_backup = self.collection.find_one(filter=doc_id)
 
-        removed_data = self.collection.delete_one(filter={"_id": doc_id}).raw_result
+        removed_data = self.collection.delete_one(filter={"_id": doc_id})
 
-        if removed_data["acknowledged"] and data_backup is not None:
+        if removed_data.deleted_count >= 1 and data_backup is not None:
             del data_backup["_id"]
             self.backup.insert_one(dict(data_backup))
 
-        return removed_data
+        logger.critical(removed_data)
+        return removed_data.raw_result
 
     def get_data(self, doc_id: str) -> dict:
         doc_data = self.collection.find_one(filter=doc_id)
@@ -168,6 +169,7 @@ class PyBrNewsDB:
             else:
                 logger.warning("Passed parameters does not match any of the accepted ones. Using default query option.")
 
+        print(query)
         return query
 
 
@@ -265,6 +267,8 @@ class PyBrNewsES:
 
     def update_data(self, payload: dict, doc_id: str) -> dict:
         updated_data = self.db.update(id=doc_id, body={"doc": payload}, index=self.index)
+        logger.success(updated_data)
+
         return updated_data
 
     def delete_data(self, doc_id: str, make_backup: bool = False) -> dict:
@@ -279,6 +283,7 @@ class PyBrNewsES:
         if backup_data is not None:
             self.db.index(index=f"{self.index}_bkp", body=backup_data, refresh=True)
 
+        logger.critical(removed_data)
         return removed_data
 
     def get_data(self, doc_id: str) -> Any:
@@ -384,7 +389,19 @@ class PyBrNewsFS:
         if parsed_data is None:
             raise AttributeError("Parsed Data Dictionary cannot be an NoneType value.")
 
-        export_time = datetime.today().strftime("%Y_%m_%d_%H_%M_%S")
+        if "_id" in parsed_data.keys():
+            del parsed_data["_id"]
+
+        if "html" in parsed_data.keys():
+            del parsed_data["html"]
+
+        for field in parsed_data.keys():
+            if type(parsed_data[field]) is datetime:
+                parsed_data[field] = parsed_data[field].strftime("%Y-%m-%dT%H:%M:%S.%f")
+
+            parsed_data[field] = str(parsed_data[field])
+
+        export_time = datetime.today().strftime("%Y_%m_%d_%H_%M_%S_%f")
         file_name = f"ParsedNewsData_{export_time}.json"
         try:
             with open(f"{self.save_path}{file_name}", mode="w", encoding="utf-8") as json_file:

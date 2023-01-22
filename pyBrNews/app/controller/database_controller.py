@@ -18,7 +18,13 @@ class DatabaseController:
 
     def retrieve_doc_data(self, document_id: str) -> Tuple[dict, List[str]]:
         document_data = self.database.get_data(doc_id=document_id)
-        fields = list(document_data.keys())
+        fields = []
+
+        for field in document_data.keys():
+            if "_id" in field or "entry_dt" in field:
+                continue
+
+            fields.append(field)
 
         return document_data, fields
 
