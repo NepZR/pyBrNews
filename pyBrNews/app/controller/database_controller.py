@@ -1,10 +1,11 @@
-from typing import Union, List
-from pyBrNews.config.database import PyBrNewsDB, PyBrNewsES
+from typing import Union, List, Tuple
+from pyBrNews.config.database import PyBrNewsDB, PyBrNewsES, PyBrNewsFS
 
 
 class DatabaseController:
     def __init__(self, db_backend: str = "mongodb") -> None:
         self.database: Union[PyBrNewsDB, PyBrNewsES] = self._set_db_backend(db_backend=db_backend)
+        self.fs_database: PyBrNewsFS = PyBrNewsFS()
 
     @staticmethod
     def _set_db_backend(db_backend: str) -> Union[PyBrNewsDB, PyBrNewsES]:
@@ -14,6 +15,12 @@ class DatabaseController:
             db = PyBrNewsDB()
 
         return db
+
+    def retrieve_doc_data(self, document_id: str) -> Tuple[dict, List[str]]:
+        document_data = self.database.get_data(doc_id=document_id)
+        fields = list(document_data.keys())
+
+        return document_data, fields
 
 
 if __name__ == "__main__":
