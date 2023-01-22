@@ -54,6 +54,8 @@ class ViewController:
         document_data, available_fields = self.db_controller.retrieve_doc_data(document_id)
         inspect_elements = []
         for field in available_fields:
+            if "_id" in field or "entry_dt" in field:
+                continue
             inspect_element = [
                 PySimpleGUI.Text(f'{field}: ', font=("Segoi UI", 11, "bold")),
                 PySimpleGUI.InputText(
@@ -99,12 +101,22 @@ class ViewController:
         if query_params["search_query_platform_exame"]:
             platforms.append("Exame")
 
+        if len(platforms) == 0:
+            platforms = None
+
         search_query = (query_params["search_query_text"] + " and") if query_params["search_all_terms"] else (
             query_params["search_query_text"]
         )
 
-        search_init_final_date = (query_params["search_query_init_date"], query_params["search_query_final_date"])
-        search_limit = query_params["search_query_limit"]
+        if len(search_query) < 1:
+            search_query = None
+
+        if "Please" in query_params["search_query_init_date"] and "Please" in query_params["search_query_final_date"]:
+            search_init_final_date = None
+        else:
+            search_init_final_date = (query_params["search_query_init_date"], query_params["search_query_final_date"])
+
+        search_limit = int(query_params["search_query_limit"])
 
         query_response = [data for data in self.db_controller.database.read_data(
             origin=platforms, search_query=search_query, init_final_year=search_init_final_date, limit=search_limit
