@@ -36,7 +36,7 @@ class PyBrNewsView(ViewController):
                     ],
                     [self.ui_handler.Col(
                         [[self.ui_handler.Button(
-                            'Get news from pyBrNews', key="get_news", enable_events=True
+                            'Run Crawler', key="get_news", enable_events=True
                         )]], pad=(0, 10), justification="right"
                     )],
 
@@ -119,11 +119,24 @@ class PyBrNewsView(ViewController):
 
         inspect_tab = [
             [
-                # self.ui_handler.Table(
-                #     values=entity_data, headings=["Name", "ID", "Category"],
-                #     col_widths=list(map(lambda x: len(x) + 10, ["Name", "ID", ""])),
-                #     expand_x=True, expand_y=True, auto_size_columns=False, num_rows=25
-                # )
+                self.ui_handler.Button(
+                    "Save Modifications", button_color='limegreen', pad=(4, 10), key="trigger_save_edit_document",
+                    expand_x=True, mouseover_colors=("white", "green"), enable_events=True
+                ),
+                self.ui_handler.Button(
+                    "Delete", button_color='red', pad=(4, 10), key="trigger_delete_document",
+                    expand_x=True, mouseover_colors=("white", "darkred"), enable_events=True
+                ),
+                self.ui_handler.Button(
+                    "Export Data", button_color='royalblue', pad=(4, 10), key="trigger_export_document",
+                    expand_x=True, mouseover_colors=("white", "darkblue"), enable_events=True
+                ),
+                self.ui_handler.FolderBrowse(
+                    "Choose Export Path", button_color='royalblue', pad=(4, 10), key="export_document_path"
+                ),
+            ],
+            [
+                self.ui_handler.Column(key="-INSPECTION_FIELDS-", expand_x=True, justification="center", layout=[])
             ]
         ]
 
@@ -140,7 +153,7 @@ class PyBrNewsView(ViewController):
             [self.ui_handler.TabGroup([[
                 self.ui_handler.Tab('Parse News', actions_tab),
                 self.ui_handler.Tab('Search Data', search_tab),
-                self.ui_handler.Tab('Inspection Tool', inspect_tab),
+                self.ui_handler.Tab('Inspection Tool (No Data)', inspect_tab),
             ]])
             ],
             [self.ui_handler.Text(
@@ -152,7 +165,7 @@ class PyBrNewsView(ViewController):
             ],
             [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 10))],
             [self.ui_handler.Text(
-                "© 2022 Lucas Rodrigues\nBuild v0.2.0-alpha1 (Branch: college/app-project)",
+                "© 2022 Lucas Rodrigues\nBuild v0.2.0-rc1 (Branch: college/app-project)",
                 font=("Segoi UI", 11), expand_x=True, justification="center"
             )],
             [self.ui_handler.Text(
