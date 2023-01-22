@@ -108,6 +108,10 @@ class PyBrNewsDB:
 
         return removed_data
 
+    def get_data(self, doc_id: str) -> dict:
+        doc_data = self.collection.find_one(filter=doc_id)
+        return doc_data
+
     def check_duplicates(self, parsed_data: dict) -> bool:
         """
         Checks if the parsed data is already in the database and prevents from being duplicated
@@ -266,13 +270,20 @@ class PyBrNewsES:
     def delete_data(self, doc_id: str, make_backup: bool = False) -> dict:
         backup_data = None
         if make_backup:
-            backup_data = self.db.get(index=self.index, id=doc_id)
+            retrieved_data = self.db.get(index=self.index, id=doc_id)
+            backup_data = retrieved_data["_source"]
+            backup_data["original_id"] = retrieved_data["_id"]
+            backup_data["original_index"] = retrieved_data["_index"]
 
         removed_data = self.db.delete(index=self.index, id=doc_id)
         if backup_data is not None:
             self.db.index(index=f"{self.index}_bkp", body=backup_data, refresh=True)
 
         return removed_data
+
+    def get_data(self, doc_id: str) -> Any:
+        doc_data = self.db.get(index=self.index, id=doc_id)
+        return doc_data["_source"]
 
     def check_duplicates(self, parsed_data: dict) -> bool:
         """
