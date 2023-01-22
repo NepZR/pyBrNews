@@ -1,4 +1,6 @@
-from typing import List, Optional
+import PySimpleGUI
+
+from typing import List, Optional, Tuple
 
 from pyBrNews.app.controller.database_controller import DatabaseController
 from pyBrNews.config.database import PyBrNewsDB
@@ -47,6 +49,46 @@ class ViewController:
             db_switch_str = f"Switch to PyBrNewsDB (MongoDB)"
 
         return db_switch_str
+
+    def get_inspection_tool_fields(self, document_id: str) -> List[list]:
+        document_data, available_fields = self.db_controller.retrieve_doc_data(document_id)
+        inspect_elements = []
+        for field in available_fields:
+            inspect_element = [
+                PySimpleGUI.Text(f'{field}: ', font=("Segoi UI", 11, "bold")),
+                PySimpleGUI.InputText(
+                    default_text=document_data[field], key=f'doc_data_inspect_{field}', expand_x=True, readonly=False
+                )
+            ]
+            inspect_elements.append(inspect_element)
+
+        return inspect_elements
+
+    def trigger_document_deletion(
+            self,
+            doc_info: Tuple[str, str, str],
+            user_interface: PySimpleGUI.Window,
+            make_backup: bool = True
+    ) -> None:
+        doc_id = doc_info[2]
+
+        self.db_controller.database.delete_data(doc_id=doc_id, make_backup=make_backup)
+        for fields in user_interface.key_dict.keys():
+            if "doc_data_inspect_" in str(fields):
+                user_interface[fields].update("")
+
+        updated_results_list = list(user_interface["-RESULT_DATA-"].get())
+        rm_index = updated_results_list.index(doc_info)
+        del updated_results_list[rm_index]
+
+        user_interface["-RESULT_DATA-"].update(updated_results_list)
+        user_interface[f"Inspection Tool (No Data)"].update("Inspection Tool (No Data)")
+
+    def trigger_export_document(self, doc_id: str, export_path: str) -> None:
+        self.db_controller.fs_database.set_save_path(fs_save_path=export_path)
+
+        doc_data = self.db_controller.database.get_data(doc_id=doc_id)
+        self.db_controller.fs_database.to_json(parsed_data=doc_data)
 
     def search_data(self, query_params: dict) -> List[List[str]]:
         platforms = []
