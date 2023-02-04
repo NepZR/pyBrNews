@@ -143,7 +143,7 @@ class PyBrNewsDB:
         for arg in args:
             if type(arg) is str:
                 sharded_search = arg.split(" ")
-                fields = ["title", "abstract", "body", "search_keyword"]
+                fields = ["title", "abstract", "body"]
                 _filter = "or" if "and" not in sharded_search else "and"
                 if "and" in _filter:
                     del sharded_search[sharded_search.index(_filter)]

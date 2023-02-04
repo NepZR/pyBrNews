@@ -32,7 +32,14 @@ class PyBrNewsView(ViewController):
                         self.ui_handler.Text('Search Platforms', font=("Segoi UI", 11, "bold"), expand_x=True),
                         self.ui_handler.Checkbox('Portal G1', key='news_platform_g1'),
                         self.ui_handler.Checkbox('Folha de São Paulo', key='news_platform_folhasp'),
-                        self.ui_handler.Checkbox('Exame', key='news_platform_exame')
+                        self.ui_handler.Checkbox('Exame', key='news_platform_exame'),
+                        self.ui_handler.Text('', expand_x=True, justification="right"),
+                        self.ui_handler.Text(
+                            'No. Pages (Limit)', font=("Segoi UI", 11, "bold"), expand_x=True, justification="right"
+                        ),
+                        self.ui_handler.Input(
+                            default_text='0', key="acquire_news_page_limit", justification="right"
+                        )
                     ],
                     [self.ui_handler.Col(
                         [[self.ui_handler.Button(
@@ -165,7 +172,7 @@ class PyBrNewsView(ViewController):
             ],
             [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 10))],
             [self.ui_handler.Text(
-                "© 2022 Lucas Rodrigues\nBuild v0.2.0-rc1 (Branch: college/app-project)",
+                "© 2023 Lucas Rodrigues\nBuild v0.2.0-rc2 (Branch: college/app-project)",
                 font=("Segoi UI", 11), expand_x=True, justification="center"
             )],
             [self.ui_handler.Text(

@@ -130,21 +130,25 @@ class ViewController:
     def search_and_insert_news(self, search_params: dict) -> List[List[str]]:
         news_urls = {"g1": None, "folhasp": None, "exame": None}
         search_term = search_params["search_keyword"]
+        if not search_params["acquire_news_page_limit"].isnumeric():
+            search_limit = 100
+        else:
+            search_limit = int(search_params["acquire_news_page_limit"])
 
         if search_params["news_platform_g1"]:
-            news_urls["g1"] = self.g1.search_news(keywords=[search_term])
+            news_urls["g1"] = self.g1.search_news(keywords=[search_term], max_pages=search_limit)
             for article_data in self.g1.parse_news(news_urls=news_urls["g1"], parse_body=True, save_html=False):
                 article_data["search_keyword"] = search_term
                 self.db_controller.database.insert_data(parsed_data=article_data)
 
         if search_params["news_platform_folhasp"]:
-            news_urls["folhasp"] = self.folha.search_news(keywords=[search_term], max_pages=1000)
+            news_urls["folhasp"] = self.folha.search_news(keywords=[search_term], max_pages=search_limit)
             for article_data in self.folha.parse_news(news_urls=news_urls["folhasp"], parse_body=True, save_html=False):
                 article_data["search_keyword"] = search_term
                 self.db_controller.database.insert_data(parsed_data=article_data)
 
         if search_params["news_platform_exame"]:
-            news_urls["exame"] = self.exame.search_news(keywords=[search_term])
+            news_urls["exame"] = self.exame.search_news(keywords=[search_term], max_pages=search_limit)
             for article_data in self.exame.parse_news(news_urls=news_urls["exame"], parse_body=True, save_html=False):
                 article_data["search_keyword"] = search_term
                 self.db_controller.database.insert_data(parsed_data=article_data)

@@ -1,3 +1,4 @@
+import json
 from typing import Union, List, Tuple
 from pyBrNews.config.database import PyBrNewsDB, PyBrNewsES, PyBrNewsFS
 
@@ -27,6 +28,12 @@ class DatabaseController:
             fields.append(field)
 
         return document_data, fields
+
+    def import_ext_data(self, file_src: str) -> None:
+        with open(file_src, "rb") as input_data:
+            import_data = json.load(input_data)
+
+        self.database.insert_data(parsed_data=import_data)
 
 
 if __name__ == "__main__":
