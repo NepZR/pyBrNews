@@ -72,6 +72,9 @@ class PyBrNews(PyBrNewsView):
 
                 self.db_controller.database.update_data(payload=updated_data, doc_id=doc_id)
 
+            elif "trigger_import_document" in event and len(data["import_document_path"]) > 0:
+                self.trigger_import_document(import_path=data["import_document_path"])
+
 
 if __name__ == '__main__':
     app = PyBrNews()

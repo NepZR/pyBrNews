@@ -1,5 +1,6 @@
-import json
+from datetime import datetime
 from typing import Union, List, Tuple
+
 from pyBrNews.config.database import PyBrNewsDB, PyBrNewsES, PyBrNewsFS
 
 
@@ -29,9 +30,9 @@ class DatabaseController:
 
         return document_data, fields
 
-    def import_ext_data(self, file_src: str) -> None:
-        with open(file_src, "rb") as input_data:
-            import_data = json.load(input_data)
+    def import_ext_data(self, import_data: dict) -> None:
+        del import_data["entry_dt"]
+        import_data["date"] = datetime.strptime(import_data["date"], "%Y-%m-%dT%H:%M:%S.%f")
 
         self.database.insert_data(parsed_data=import_data)
 

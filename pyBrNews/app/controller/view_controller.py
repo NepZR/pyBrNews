@@ -1,4 +1,5 @@
 import PySimpleGUI
+import json
 
 from typing import List, Optional, Tuple
 
@@ -91,6 +92,12 @@ class ViewController:
 
         doc_data = self.db_controller.database.get_data(doc_id=doc_id)
         self.db_controller.fs_database.to_json(parsed_data=doc_data)
+
+    def trigger_import_document(self, import_path: str) -> None:
+        with open(import_path, "rb") as input_data:
+            import_data = json.load(input_data)
+
+        self.db_controller.import_ext_data(import_data=import_data)
 
     def search_data(self, query_params: dict) -> List[List[str]]:
         platforms = []

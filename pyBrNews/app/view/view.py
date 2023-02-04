@@ -16,7 +16,8 @@ class PyBrNewsView(ViewController):
             element_justification="center",
             default_element_size=(400, 480),
             grab_anywhere=False,
-            size=(800, 750)
+            font=('CaskaydiaCove Nerd Font Mono', 10),
+            size=(800, 800)
         )
 
     def _user_layout(self) -> List[Any]:
@@ -26,16 +27,16 @@ class PyBrNewsView(ViewController):
             [self.ui_handler.Column(
                 key="-NEWS-ACTIONS-", expand_x=True,
                 layout=[
-                    [self.ui_handler.Text('Search Keyword: ', font=("Segoi UI", 11, "bold")),
+                    [self.ui_handler.Text('Search Keyword: ', font=("CaskaydiaCove Nerd Font Mono", 11, "bold")),
                      self.ui_handler.InputText('', key='search_keyword', expand_x=True)],
                     [
-                        self.ui_handler.Text('Search Platforms', font=("Segoi UI", 11, "bold"), expand_x=True),
+                        self.ui_handler.Text('Search Platforms', font=("CaskaydiaCove Nerd Font Mono", 11, "bold"), expand_x=True),
                         self.ui_handler.Checkbox('Portal G1', key='news_platform_g1'),
                         self.ui_handler.Checkbox('Folha de São Paulo', key='news_platform_folhasp'),
                         self.ui_handler.Checkbox('Exame', key='news_platform_exame'),
                         self.ui_handler.Text('', expand_x=True, justification="right"),
                         self.ui_handler.Text(
-                            'No. Pages (Limit)', font=("Segoi UI", 11, "bold"), expand_x=True, justification="right"
+                            'No. Pages (Limit)', font=("CaskaydiaCove Nerd Font Mono", 11, "bold"), expand_x=True, justification="right"
                         ),
                         self.ui_handler.Input(
                             default_text='0', key="acquire_news_page_limit", justification="right"
@@ -49,7 +50,7 @@ class PyBrNewsView(ViewController):
 
                     [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 0))],
                     [self.ui_handler.Text(
-                        f'Result Output (limited to 30)', font=("Segoi UI", 16, "bold"),
+                        f'Result Output (limited to 30)', font=("CaskaydiaCove Nerd Font Mono", 16, "bold"),
                         border_width=1, pad=(5, 5), key="-DOUT_TEXT"
                     )],
                     [self.ui_handler.Table(
@@ -64,15 +65,15 @@ class PyBrNewsView(ViewController):
             [self.ui_handler.Column(
                 key="-SEARCH-ACTIONS-", expand_x=True,
                 layout=[
-                    [self.ui_handler.Text('Search Query: ', font=("Segoi UI", 11, "bold")),
+                    [self.ui_handler.Text('Search Query: ', font=("CaskaydiaCove Nerd Font Mono", 11, "bold")),
                      self.ui_handler.InputText('', key='search_query_text'),
                      ],
                     [self.ui_handler.Checkbox(
-                        'Use \"AND\" Query', font=("Segoi UI", 11, "bold"), key="search_all_terms", expand_x=True
-                    ), self.ui_handler.Text('Query Limit', font=("Segoi UI", 11, "bold")),
+                        'Use \"AND\" Query', font=("CaskaydiaCove Nerd Font Mono", 11, "bold"), key="search_all_terms", expand_x=True
+                    ), self.ui_handler.Text('Query Limit', font=("CaskaydiaCove Nerd Font Mono", 11, "bold")),
                     ],
                     [
-                        self.ui_handler.Text('Search Platforms', font=("Segoi UI", 11, "bold"), expand_x=True),
+                        self.ui_handler.Text('Search Platforms', font=("CaskaydiaCove Nerd Font Mono", 11, "bold"), expand_x=True),
                         self.ui_handler.Text(expand_x=True),
                         self.ui_handler.Combo(
                             [i for i in range(0, 1100, 100)], key="search_query_limit"
@@ -108,7 +109,7 @@ class PyBrNewsView(ViewController):
 
                     [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 0))],
                     [self.ui_handler.Text(
-                        f'Search Result', font=("Segoi UI", 16, "bold"),
+                        f'Search Result', font=("CaskaydiaCove Nerd Font Mono", 16, "bold"),
                         border_width=1, pad=(5, 5), key="-DOUT_SEARCH"
                     )],
                     [self.ui_handler.Table(
@@ -135,11 +136,18 @@ class PyBrNewsView(ViewController):
                     expand_x=True, mouseover_colors=("white", "darkred"), enable_events=True
                 ),
                 self.ui_handler.Button(
-                    "Export Data", button_color='royalblue', pad=(4, 10), key="trigger_export_document",
-                    expand_x=True, mouseover_colors=("white", "darkblue"), enable_events=True
+                    "Export Data TRG", button_color='royalblue', pad=(4, 30), key="trigger_export_document",
+                    expand_x=False, mouseover_colors=("white", "darkblue"), enable_events=True, visible=False
                 ),
                 self.ui_handler.FolderBrowse(
-                    "Choose Export Path", button_color='royalblue', pad=(4, 10), key="export_document_path"
+                    "Export Data", button_color='royalblue', pad=(4, 10), key="export_document_path"
+                ),
+                self.ui_handler.Button(
+                    "Import JSON Data TRG", button_color='royalblue', pad=(4, 30), key="trigger_import_document",
+                    expand_x=False, mouseover_colors=("white", "darkblue"), enable_events=True, visible=False
+                ),
+                self.ui_handler.FileBrowse(
+                    "Import JSON Data", button_color='darkgreen', pad=(4, 10), key="import_document_path"
                 ),
             ],
             [
@@ -150,11 +158,11 @@ class PyBrNewsView(ViewController):
         layout = [
             [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 10))],
             [self.ui_handler.Text(
-                'pyBrNews', font=("Segoi UI", 22), expand_x=True, pad=(0, 5), justification="center"
+                'pyBrNews', font=("CaskaydiaCove Nerd Font Mono", 22), expand_x=True, pad=(0, 5), justification="center"
             )],
             [self.ui_handler.Text(
                 'A Brazilian News Website Data Acquisition Library for Python',
-                font=("Segoi UI", 14, "italic"), expand_x=True, pad=(0, 5), justification="center"
+                font=("CaskaydiaCove Nerd Font Mono", 14, "italic"), expand_x=True, pad=(0, 5), justification="center"
             )],
             [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 10))],
             [self.ui_handler.TabGroup([[
@@ -165,7 +173,7 @@ class PyBrNewsView(ViewController):
             ],
             [self.ui_handler.Text(
                self.retrieve_db_backend_info(), expand_x=True, justification="left",
-               font=("Segoi UI", 12, "bold"), key="-DB_BACKEND_INFO-", pad=(0, 15)
+               font=("CaskaydiaCove Nerd Font Mono", 12, "bold"), key="-DB_BACKEND_INFO-", pad=(0, 15)
             ), self.ui_handler.Button(
                 button_text=self.retrieve_db_switch_str(), key="db_backend_set", enable_events=True
             )
@@ -173,11 +181,11 @@ class PyBrNewsView(ViewController):
             [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 10))],
             [self.ui_handler.Text(
                 "© 2023 Lucas Rodrigues\nBuild v0.2.0-rc2 (Branch: college/app-project)",
-                font=("Segoi UI", 11), expand_x=True, justification="center"
+                font=("CaskaydiaCove Nerd Font Mono", 11), expand_x=True, justification="center"
             )],
             [self.ui_handler.Text(
                 "pyBrNews Project, made with ❤️ by Lucas Rodrigues (@NepZR)",
-                font=("Segoi UI", 9, "bold"), expand_x=True, justification="center"
+                font=("CaskaydiaCove Nerd Font Mono", 9, "bold"), expand_x=True, justification="center"
             )],
             [self.ui_handler.HorizontalSeparator(color="black", pad=(0, 10))],
             [self.ui_handler.Button(
